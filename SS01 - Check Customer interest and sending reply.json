@@ -1,0 +1,503 @@
+{
+  "name": "SS01 - Check Customer interest and sending reply",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "includeSpamTrash": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "63a2bc33-c81a-4add-8624-cb975f475b97",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MeqBOByCdrdCwa3t",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const from = ( $('Gmail Trigger').first().json.From|| item.json.from || \"\").toString();\n  const match = from.match(/[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}/);\n  let email = match ? match[0] : \"\";\n  // remove escaped \\n, and real newlines/carriage returns, then trim\n  email = email.replace(/\\\\n/g, \"\").replace(/[\\r\\n]+/g, \"\").trim();\n  return {\n    json: {\n      ...item.json,\n      Email: email\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "68e7c426-101a-4278-b4dd-719e1235398c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw",
+          "mode": "list",
+          "cachedResultName": "Cold Email n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cold Emails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Code in JavaScript').item.json.Email }}",
+            "Status": "={{ $json.label }}",
+            "AI Analysis": "={{ $json.ai_analysis_for_sheet }}",
+            "AI Confidence Level ": "={{ $json.confidence }}",
+            "Recommended Reply Sent": "={{ $json.recommended_reply_body }}",
+            "Signals": "={{ $json.signals }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last name",
+              "displayName": "Last name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Analysis",
+              "displayName": "AI Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Confidence Level ",
+              "displayName": "AI Confidence Level ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Signals",
+              "displayName": "Signals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recommended Reply Sent",
+              "displayName": "Recommended Reply Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1968,
+        -16
+      ],
+      "id": "bf4e2684-4787-44f0-8391-19db987e5b11",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q7UubCgpsFQDv8Gy",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Return JSON ONLY in one line with keys:\n{\"label\":\"interested|not-interested|unclear\",\"confidence\":0-1,\"signals\":[\"3-6 clues\"],\"recommended_reply_subject\":\"concise subject\",\"recommended_reply_body\":\"polite email body (must start with Hi/Hello \\n and end with \\n'Regards' change the line after hello and before regards)\",\"ai_analysis_for_sheet\":\"1-2 sentences: why + next step\"}\n\nRules:\n- interested: asks price/info/call/availability, proposes times, yes/let’s talk/ok, shares phone/email, asks demo/proposal\n- not-interested: decline/not interested/stop/unsubscribe/remove, wrong person, complaint, no budget/time now, OOO/bounce\n- unclear: vague/truncated/no action\n- Opt-out ⇒ label = not-interested\n\nScoring:\nraw=(#pos-#neg)+clarity(+1 clear/0 mixed/−1 vague). Label: raw≥2→interested; raw≤−1→not-interested; else unclear.\nconfidence=0.50+0.10*min(3,|raw|)+0.05*(len>15w)+0.05*(signals≥3); clamp 0–1 (2 dp).\n\nEmail format (STRICT):\n- Subject: concise, relevant to MESSAGE.\n- Body: \n  - MUST start with “Hi {{ $json['First Name'] }},” if available, else “Hi,” or “Hello,”\n  - 1–2 short paragraphs tailored to MESSAGE signals.\n  - Clear CTA: (**interested**) offer two time options or request preferred time and mention brief pricing/overview. (**unclear**) ask ONE focused question + offer “one-page summary” OR “10-minute call”. (**opt-out**) confirm removal only.\n  - MUST end with: “Regards, <Your Name>”\n  - ≤900 characters. No markdown/backticks/newlines in JSON.\n\nMESSAGE:\n{{ $('Get a message').item.json.body || $('Get a message').item.json.text || $('Get a message').item.json.snippet }}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1360,
+        -16
+      ],
+      "id": "68084bd9-1a1f-4090-ae80-bd3168134c55",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-14b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "1316a3df-6158-4976-8b9c-e2ed302d8a16",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "1MjcKHNlgEl9D68f",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0efb39ec-291c-423c-8feb-e427ba2808e4",
+      "name": "Get a message",
+      "webhookId": "0d7d483d-9629-45a0-8253-22a6b7d5bc12",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MeqBOByCdrdCwa3t",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a52322fa-4b1c-4f49-9a95-14d2e1f1a140",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "={{ $json.Email }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "372afb82-a55f-48d9-8963-0b06edd4a2e1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw",
+          "mode": "list",
+          "cachedResultName": "Cold Email n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cold Emails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ $json.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        0
+      ],
+      "id": "c2cf8725-d801-4374-954b-a792ddcd44c2",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q7UubCgpsFQDv8Gy",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Minimal parser for LLM output → subject/body + core fields\nfunction toObj(v) {\n  if (v == null) return {};\n  if (typeof v === 'string') {\n    const s = v.trim();\n    try { return JSON.parse(s); } catch {\n      const m = s.match(/\\{[\\s\\S]*\\}/);\n      if (m) return JSON.parse(m[0]);\n      throw new Error('Cannot parse LLM JSON: ' + s);\n    }\n  }\n  return v;\n}\n\n// --- Sentence-case utility: capitalize first letter after start, punctuation, or newline ---\nfunction sentenceCase(text) {\n  if (!text) return '';\n  // Normalize spaces but keep newlines (we control where to insert them)\n  let out = text.replace(/[ \\t]+/g, ' ').replace(/\\r\\n?/g, '\\n').trim();\n  // Capitalize starts of sentences and lines\n  out = out.replace(/(^|[.!?]\\s+|\\n)([a-z])/g, (m, p1, p2) => p1 + p2.toUpperCase());\n  return out;\n}\n\n// --- Body formatter: greeting line, sentence case, and proper \"Regards\" block ---\nfunction formatEmailBodyPlain(s) {\n  if (!s) return '';\n  let raw = String(s).replace(/\\r\\n?/g, '\\n').trim();\n\n  // 1) Ensure greeting is on its own line: \"Hi/Hello Name,\"\n  // Keep exactly one blank line after greeting; do not add extra line breaks elsewhere.\n  raw = raw.replace(/^(?:\\s*)(hi|hello)\\s+([^,]+,)\\s*/i, (m, hi, nameComma) => {\n    const h = hi.charAt(0).toUpperCase() + hi.slice(1).toLowerCase();\n    return `${h} ${nameComma}\\n\\n`;\n  });\n\n  // 2) Split into greeting + rest to sentence-case only the body (not greeting)\n  let greeting = '';\n  let rest = raw;\n  const grMatch = raw.match(/^((?:Hi|Hello)\\s+[^,]+,\\n\\n)/i);\n  if (grMatch) {\n    greeting = grMatch[1];\n    rest = raw.slice(greeting.length);\n  }\n\n  // 3) Sentence-case the body paragraphs (avoid creating new line breaks)\n  rest = sentenceCase(rest);\n\n  // 4) Put \"Regards,\" (or \"Best regards,\") on its own line and name on next line\n  // Handle both \"Regards,\" and \"Best regards,\"\n  const lower = rest.toLowerCase();\n  let idx = lower.lastIndexOf('regards,');\n  if (idx >= 0) {\n    const before = rest.slice(0, idx).replace(/\\s+$/,'');\n    const after = rest.slice(idx + 'regards,'.length).trim();\n    rest = `${before}\\n\\nRegards,\\n${after}`;\n  }\n  // If \"Best regards,\" exists instead\n  else {\n    const idxBest = lower.lastIndexOf('best regards,');\n    if (idxBest >= 0) {\n      const before = rest.slice(0, idxBest).replace(/\\s+$/,'');\n      const after = rest.slice(idxBest + 'best regards,'.length).trim();\n      rest = `${before}\\n\\nBest regards,\\n${after}`;\n    }\n  }\n\n  return (greeting || '') + rest;\n}\n\nfunction toHtmlFromPlain(s) {\n  if (!s) return '';\n  const esc = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\n  return esc.replace(/\\n\\n+/g, '<br><br>').replace(/\\n/g, '<br>');\n}\n\n// 1) Read raw LLM response from current item\nconst raw = $json.text ?? $json.output ?? $json.data ?? $json.body ?? $json;\n\n// 2) Normalize to object\nconst obj = toObj(raw);\n\n// 3) Subject/body extraction (Option A preferred; Option B fallback)\nlet subject = '';\nlet body = '';\n\nif (typeof obj.recommended_reply_subject === 'string' || typeof obj.recommended_reply_body === 'string') {\n  subject = (obj.recommended_reply_subject || '').trim();\n  body = (obj.recommended_reply_body || '').trim();\n} else if (typeof obj.recommended_reply === 'string') {\n  const rr = obj.recommended_reply.trim();\n  const m = rr.match(/subject\\s*:\\s*(.*?)\\s*\\|\\s*body\\s*:\\s*([\\s\\S]*)/i);\n  if (m) { subject = m[1].trim(); body = m[2].trim(); }\n  else { body = rr; subject = (obj.label === 'interested') ? 'Quick Next Steps' : (obj.label === 'not-interested') ? 'Acknowledged' : 'Quick Clarification'; }\n}\n\n// 4) Ensure subject starts with a capital letter (do not force title case)\nif (subject) subject = subject.charAt(0).toUpperCase() + subject.slice(1);\n\n// 5) Format the body (controlled line breaks + sentence case)\nconst bodyFormatted = formatEmailBodyPlain(body);\nconst bodyHtml = toHtmlFromPlain(bodyFormatted);\n\n// 6) Output\nreturn [{\n  json: {\n    label: obj.label ?? '',\n    confidence: (typeof obj.confidence === 'number') ? obj.confidence : null,\n    signals: Array.isArray(obj.signals) ? obj.signals : [],\n    recommended_reply_subject: subject,\n    recommended_reply_body: body,                   // original\n    recommended_reply_body_formatted: bodyFormatted, // plain text (use this)\n    recommended_reply_body_html: bodyHtml,           // HTML <br> version\n    ai_analysis_for_sheet: obj.ai_analysis_for_sheet ?? ''\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        -16
+      ],
+      "id": "64eef2f8-2d53-4226-b529-010aae0421fe",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Get a message').item.json.id }}",
+        "message": "={{ $('Code in JavaScript1').item.json.recommended_reply_body_html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2176,
+        -16
+      ],
+      "id": "3a8d98ad-ee8b-453f-be6b-794d80f66f5f",
+      "name": "Reply to a message",
+      "webhookId": "10032767-4e7c-45c3-a415-a8114bc0997e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MeqBOByCdrdCwa3t",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "199a06da43c4a0a8",
+          "threadId": "199a05fee757da55",
+          "snippet": "hi there, this sounds useful—we&#39;re trying to cut no-shows and fill weekday gaps. i can do a quick 10-min call tomorrow at 10:30am or 2pm et. if those don&#39;t work, send two other times. thanks,",
+          "payload": {
+            "mimeType": "multipart/alternative"
+          },
+          "sizeEstimate": 7996,
+          "historyId": "231459",
+          "internalDate": "1759333143000",
+          "labels": [
+            {
+              "id": "INBOX",
+              "name": "INBOX"
+            },
+            {
+              "id": "IMPORTANT",
+              "name": "IMPORTANT"
+            },
+            {
+              "id": "CATEGORY_PERSONAL",
+              "name": "CATEGORY_PERSONAL"
+            },
+            {
+              "id": "UNREAD",
+              "name": "UNREAD"
+            }
+          ],
+          "From": "Huzaifa Ameer <operations@systemapic.agency>",
+          "Subject": "Re: Are you open to new client acquisition ideas?",
+          "To": "backofficeworldops4@gmail.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1abec301-b6e6-4df4-b62a-1bd975898a07",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6c4c446d5304742a3c3b35610a91a9314f8fa6e78abf59256949d198dc0f9226"
+  },
+  "id": "SKLGNOBvJPGNA360",
+  "tags": []
+}

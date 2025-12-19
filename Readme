@@ -1,0 +1,88 @@
+# n8n-cold-email-ai-tracking
+
+Automated cold email outreach system built with **n8n**, using **Google Sheets** as the source, **Gmail** for sending and receiving emails, and **OpenAI** to analyze customer interest and trigger intelligent follow-up replies.
+
+---
+
+## 🚀 Overview
+
+This automation monitors new rows added to a Google Sheet, sends cold emails automatically, tracks replies in Gmail, and uses AI to determine customer interest. Based on the analysis, it can send appropriate follow-up responses without manual intervention.
+
+---
+
+## 🧩 Workflows Included
+
+### 1. SS01 – Cold Email Tracking Automation
+- Triggers when a new row is added to Google Sheets
+- Sends a cold email via Gmail
+- Logs email activity for tracking
+
+### 2. SS01 – Check Customer Interest & Send Reply
+- Monitors Gmail inbox for replies
+- Uses OpenAI to analyze customer intent
+- Automatically sends follow-up responses based on interest level
+
+---
+
+## 🛠 Tech Stack
+
+- **n8n**
+- **Google Sheets**
+- **Gmail**
+- **OpenAI (Free Model)**
+- **JavaScript (n8n Function Nodes)**
+
+---
+
+## 📄 Google Sheet (Data Source)
+
+The automation uses the following Google Sheet as its primary data source for email outreach:
+
+🔗 **Google Sheet Link:**  
+https://docs.google.com/spreadsheets/d/1QIxiqM-t6GA0bvL1JsBL4Axkbc11oQQacM6SizNLgbw/edit?gid=0#gid=0
+
+> The sheet contains lead data and triggers email sending when new rows are added.
+
+---
+
+## 🔄 How It Works (Flow Summary)
+
+1. New row added to Google Sheet
+2. n8n detects the new entry
+3. Cold email is sent via Gmail
+4. Gmail inbox is monitored for replies
+5. OpenAI analyzes the reply content
+6. System determines customer interest
+7. Automated follow-up email is sent (if applicable)
+
+---
+
+## ⚙️ Setup Notes
+
+- Update Google Sheets credentials in n8n
+- Connect Gmail account with proper permissions
+- Add your OpenAI API key in n8n credentials
+- Review prompt logic inside OpenAI nodes for customization
+
+---
+
+## 📌 Use Cases
+
+- Cold email outreach campaigns
+- Lead qualification automation
+- AI-assisted sales follow-ups
+- CRM pre-processing before human intervention
+
+---
+
+## 📎 Status
+
+✅ Production-ready  
+🔄 Easily extendable for CRM integrations (GHL, HubSpot, Zoho, etc.)
+
+---
+
+## 👤 Maintained By
+
+**Systemapic**  
+Automation & CRM Solutions
